@@ -4,6 +4,5 @@ databricks-sql-connector
 numpy
 scikit-learn
 pandas
-streamlit
-seaborn
-matplotlib
+
+##-e .
