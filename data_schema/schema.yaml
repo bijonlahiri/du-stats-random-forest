@@ -27,3 +27,27 @@ columns:
   - rv3_dtx: int64
   - rv3_bler: float64
   - rca_label: str
+
+numerical_columns:
+  - ibler: float64
+  - rbler: float64
+  - resbler: float64
+  - tbler: float64
+  - cqi: float64
+  - mcs: float64
+  - ri: float64
+  - rv0_tx: int64
+  - rv0_ack: int64
+  - rv0_nack: int64
+  - rv0_dtx: int64
+  - rv0_bler: float64
+  - rv2_tx: int64
+  - rv2_ack: int64
+  - rv2_nack: int64
+  - rv2_dtx: int64
+  - rv2_bler: float64
+  - rv3_tx: int64
+  - rv3_ack: int64
+  - rv3_nack: int64
+  - rv3_dtx: int64
+  - rv3_bler: float64

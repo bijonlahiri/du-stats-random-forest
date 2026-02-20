@@ -4,5 +4,5 @@ databricks-sql-connector
 numpy
 scikit-learn
 pandas
-
+pyaml
 ##-e .
