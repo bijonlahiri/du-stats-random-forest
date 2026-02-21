@@ -5,8 +5,48 @@ import pandas as pd
 import numpy as np
 import os, sys
 from dotenv import load_dotenv
-import time, yaml
+import time, yaml, pickle
 from du_stats.constants.dustats_pipeline import SLEEP_TIME, SCHEMA_FILEPATH
+
+def load_object_from_file(filepath:str)->object:
+    try:
+        if os.path.exists(filepath):
+            with open(filepath, 'rb') as file:
+                return pickle.load(file)
+        else:
+            logging.info(f'Model does not exist in filepath: {filepath}')
+            return None
+    except Exception as e:
+        raise DUStatsException(e, sys)
+
+def save_object_to_file(filepath:str, obj:object)->bool:
+    try:
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        with open(filepath, 'wb') as file:
+            pickle.dump(obj, file)
+        return True
+    except Exception as e:
+        raise DUStatsException(e, sys)
+
+def load_numpy_array_from_file(filepath:str)->np.array:
+    try:
+        if os.path.exists(filepath):
+            with open(filepath, 'rb') as file:
+                return np.load(file)
+        else:
+            logging.info(f'Numpy array file does not exist in path: {filepath}')
+            return None
+    except Exception as e:
+        raise DUStatsException(e, sys)
+
+def save_numpy_array_to_file(filepath:str, data_arr:np.array)->bool:
+    try:
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        with open(filepath, 'wb') as file:
+            np.save(file, data_arr)
+        return True
+    except Exception as e:
+        raise DUStatsException(e, sys)
 
 def save_yaml(filepath:str, obj:object)->bool:
     try:
@@ -21,7 +61,7 @@ def read_yaml(filepath:str)->dict:
     try:
         if os.path.exists(filepath):
             logging.info('Parsing yaml file')
-            with open(filepath, 'rb') as yaml_file:
+            with open(filepath, 'r') as yaml_file:
                 return yaml.safe_load(yaml_file)
         else:
             logging.info('Yaml file does not exist.')

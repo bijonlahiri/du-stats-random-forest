@@ -13,6 +13,7 @@ class DUStatsIngestion:
         self.fetch_query=dustats_ingestion_config.fetch_query
         self.raw_data_filepath=dustats_ingestion_config.raw_data_filepath
         self.train_test_split_ratio=dustats_ingestion_config.train_test_split_ratio
+        self.train_test_split_ratio_random_state=dustats_ingestion_config.train_test_split_random_state
         self.train_data_filepath=dustats_ingestion_config.train_data_filepath
         self.test_data_filepath=dustats_ingestion_config.test_data_filepath
     
@@ -36,7 +37,9 @@ class DUStatsIngestion:
             df:pd.DataFrame=self.ingest_data(self.fetch_query, self.raw_data_filepath)
             if df.columns.tolist():
                 logging.info('Splitting into train test data')
-                train_set, test_set = train_test_split(df, test_size=self.train_test_split_ratio)
+                train_set, test_set = train_test_split(
+                    df, test_size=self.train_test_split_ratio, random_state=self.train_test_split_ratio_random_state
+                )
                 if save_dataframe_to_file(self.raw_data_filepath, df):
                     dustats_ingestion_artifact.raw_data_filepath=self.raw_data_filepath
                 if save_dataframe_to_file(self.train_data_filepath, train_set):

@@ -2,7 +2,12 @@ import os, sys
 from du_stats.logging.logger import logging
 from du_stats.components.dustats_ingestion import DUStatsIngestion
 from du_stats.components.dustats_validation import DUStatsValidation
-from du_stats.entity.config_entity import DUStatsPipelineConfig, DUStatsIngestionConfig, DUStatsValidationConfig
+from du_stats.components.dustats_transformation import DUStatsTransformation
+from du_stats.components.dustats_model_trainer import DUStatsModelTrainer
+from du_stats.entity.config_entity import(
+    DUStatsPipelineConfig, DUStatsIngestionConfig, DUStatsValidationConfig, DUStatsTransformationConfig,
+    DUStatsModelTrainerConfig
+)
 from du_stats.exception.exception import DUStatsException
 
 if __name__=='__main__':
@@ -26,6 +31,25 @@ if __name__=='__main__':
             Valid Test Filepath: {dustats_validation_artifact.valid_test_data_filepath}\n
             Invalid Train Filepath: {dustats_validation_artifact.invalid_train_data_filepath}\n
             Invalid Test Filepath: {dustats_validation_artifact.invalid_test_data_filepath}\n
+        """)
+        dustats_transformation_config = DUStatsTransformationConfig(dustats_pipeline_config)
+        dustats_transformation = DUStatsTransformation(dustats_validation_artifact, dustats_transformation_config)
+        dustats_transformation_artifact = dustats_transformation.initiate_data_transformation()
+        print(f"""
+            Transformation Completed: {dustats_transformation_artifact.transformation_done}\n
+            Preprocessor Filepath: {dustats_transformation_artifact.preprocessor_filepath}\n
+            Train Array Filepath: {dustats_transformation_artifact.transformed_train_data_filepath}\n
+            Test Array Filepath: {dustats_transformation_artifact.transformed_train_data_filepath}\n
+        """)
+        dustats_model_trainer_config = DUStatsModelTrainerConfig(dustats_pipeline_config)
+        dustats_model_trainer = DUStatsModelTrainer(dustats_transformation_artifact, dustats_model_trainer_config)
+        dustats_model_trainer_artifact = dustats_model_trainer.initiate_model_trainer()
+        print(f"""
+            Model Training Completed: {dustats_model_trainer_artifact.model_training_done}\n
+            Model Filepath: {dustats_model_trainer_artifact.model_filepath}\n
+            Model Report Filepath: {dustats_model_trainer_artifact.model_report_filepath}\n
+            Best Model Name: {dustats_model_trainer_artifact.best_model_name}\n
+            Best Model Params: {dustats_model_trainer_artifact.best_model_params}\n
         """)
     except Exception as e:
         raise DUStatsException(e, sys)

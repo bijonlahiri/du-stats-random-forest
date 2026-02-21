@@ -15,3 +15,18 @@ class DUStatsValidationArtifact:
     valid_test_data_filepath: str=None
     invalid_train_data_filepath: str=None
     invalid_test_data_filepath: str=None
+
+@dataclass
+class DUStatsTransformationArtifact:
+    transformation_done:bool=False
+    transformed_train_data_filepath:str=None
+    transformed_test_data_filepath:str=None
+    preprocessor_filepath:str=None
+
+@dataclass
+class DUStatsModelTrainerArtifact:
+    model_training_done:bool=False
+    model_filepath:str=None
+    model_report_filepath:str=None
+    best_model_name:str=None
+    best_model_params:dict=None
