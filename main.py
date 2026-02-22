@@ -17,6 +17,7 @@ if __name__=='__main__':
         dustats_ingestion=DUStatsIngestion(dustats_ingestion_config=dustats_ingestion_config)
         dustats_ingestion_artifact=dustats_ingestion.initiate_data_ingestion()
         print(f"""
+            Ingestion Completed: {dustats_ingestion_artifact.ingestion_done}\n
             Ingestion Raw Dump: {dustats_ingestion_artifact.raw_data_filepath}\n
             Ingestion Train Dump: {dustats_ingestion_artifact.train_data_filepath}\n
             Ingestion Test Dump: {dustats_ingestion_artifact.test_data_filepath}\n
