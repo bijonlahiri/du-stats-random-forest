@@ -45,7 +45,7 @@ class DUStatsTransformation:
                 train_df = read_dataframe_from_file(self.valid_train_data_filepath)
                 X_train, y_train = self.get_X_y_numpy_array(train_df)
                 test_df = read_dataframe_from_file(self.valid_test_data_filepath)
-                X_test, y_test = self.get_X_y_numpy_array(train_df)
+                X_test, y_test = self.get_X_y_numpy_array(test_df)
                 scaler = StandardScaler()
                 scaler.fit(X_train)
                 save_object_to_file(self.preprocessor_object_filepath, scaler)
