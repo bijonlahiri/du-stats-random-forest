@@ -35,7 +35,7 @@ class DUStatsIngestion:
         dustats_ingestion_artifact=DUStatsIngestionArtifact()
         try:
             df:pd.DataFrame=self.ingest_data(self.fetch_query, self.raw_data_filepath)
-            if df.columns.tolist():
+            if df.shape[0] != 0:
                 logging.info('Splitting into train test data')
                 train_set, test_set = train_test_split(
                     df, test_size=self.train_test_split_ratio, random_state=self.train_test_split_ratio_random_state
