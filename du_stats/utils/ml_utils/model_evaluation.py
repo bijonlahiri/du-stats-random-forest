@@ -4,10 +4,12 @@ from du_stats.exception.exception import DUStatsException
 from du_stats.logging.logger import logging
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import f1_score, precision_score, recall_score
+import mlflow
 
 def evaluate_model(X_train:np.array, X_test:np.array, y_train:np.array, y_test:np.array, models:dict, params:dict)->dict:
     try:
         report={}
+        # mlflow.sklearn.autolog()
         for name, model in models.items():
             gs = GridSearchCV(
                 estimator=model,
@@ -16,15 +18,30 @@ def evaluate_model(X_train:np.array, X_test:np.array, y_train:np.array, y_test:n
                 n_jobs=-1,
                 verbose=3
             )
-            gs.fit(X_train, y_train)
-            y_train_pred = gs.predict(X_train)
-            y_test_pred = gs.predict(X_test)
-            train_f1_score = f1_score(y_train, y_train_pred, average='micro')
-            train_precision_score = precision_score(y_train, y_train_pred, average='micro')
-            train_recall_score = recall_score(y_train, y_train_pred, average='micro')
-            test_f1_score = f1_score(y_test, y_test_pred, average='micro')
-            test_precision_score = precision_score(y_test, y_test_pred, average='micro')
-            test_recall_score = recall_score(y_test, y_test_pred, average='micro')
+            with mlflow.start_run() as run:
+                gs.fit(X_train, y_train)
+                y_train_pred = gs.predict(X_train)
+                y_test_pred = gs.predict(X_test)
+                train_f1_score = f1_score(y_train, y_train_pred, average='micro')
+                train_precision_score = precision_score(y_train, y_train_pred, average='micro')
+                train_recall_score = recall_score(y_train, y_train_pred, average='micro')
+                mlflow.log_metric('train_f1_score', train_f1_score)
+                mlflow.log_metric('train_precision_score', train_precision_score)
+                mlflow.log_metric('train_recall_score', train_recall_score)
+                test_f1_score = f1_score(y_test, y_test_pred, average='micro')
+                test_precision_score = precision_score(y_test, y_test_pred, average='micro')
+                test_recall_score = recall_score(y_test, y_test_pred, average='micro')
+                mlflow.log_metric('test_f1_score', test_f1_score)
+                mlflow.log_metric('test_precision_score', test_precision_score)
+                mlflow.log_metric('test_recall_score', test_recall_score)
+                estimator = gs.best_estimator_
+                estimator.set_params(**gs.best_params_)
+                estimator.fit(X_train, y_train)
+                mlflow.sklearn.log_model(
+                    sk_model=estimator,
+                    artifact_path=f'{name}',
+                    registered_model_name=f'{name}'
+                )
             report[name] = {
                 'Estimator': model,
                 'Best Params': gs.best_params_,
