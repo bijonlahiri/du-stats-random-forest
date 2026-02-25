@@ -40,7 +40,7 @@ def evaluate_model(X_train:np.array, X_test:np.array, y_train:np.array, y_test:n
                 estimator.set_params(**gs.best_params_)
                 estimator.fit(X_train, y_train)
                 mlflow.sklearn.log_model(
-                    model=estimator,
+                    sk_model=estimator,
                     name=name
                 )
             report[name] = {
