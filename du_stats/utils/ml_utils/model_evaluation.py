@@ -34,13 +34,13 @@ def evaluate_model(X_train:np.array, X_test:np.array, y_train:np.array, y_test:n
                 mlflow.log_metric('test_f1_score', test_f1_score)
                 mlflow.log_metric('test_precision_score', test_precision_score)
                 mlflow.log_metric('test_recall_score', test_recall_score)
+                mlflow.log_param(**gs.best_params_)
                 estimator = gs.best_estimator_
                 estimator.set_params(**gs.best_params_)
                 estimator.fit(X_train, y_train)
                 mlflow.sklearn.log_model(
-                    sk_model=estimator,
-                    artifact_path=f'{name}',
-                    registered_model_name=f'{name}'
+                    model=estimator,
+                    name=name
                 )
             report[name] = {
                 'Estimator': model,
