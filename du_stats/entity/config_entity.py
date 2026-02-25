@@ -129,3 +129,23 @@ class DUStatsModelTrainerConfig:
             )
         except Exception as e:
             raise DUStatsException(e, sys)
+
+class DUStatsNeuralNetworkConfig:
+    def __init__(self, dustats_pipeline_config:DUStatsPipelineConfig):
+        try:
+            self.artifact_dir = dustats_pipeline_config.artifact_dir
+            self.training_dir = os.path.join(
+                self.artifact_dir,
+                dustats_pipeline.DUSTATS_NN_DIR,
+                dustats_pipeline.DUSTATS_NN_TRAINING_DIR
+            )
+            self.training_report_filepath = os.path.join(
+                self.training_dir,
+                dustats_pipeline.DUSTATS_NN_TRAINING_REPORT_FILENAME
+            )
+            self.hidden_layers = dustats_pipeline.DUSTATS_NN_NUM_HIDDEN_LAYERS
+            self.num_neurons = dustats_pipeline.DUSTATS_NN_NUM_NEURONS
+            self.num_epochs = dustats_pipeline.DUSTATS_NN_NUM_TRAINING_EPOCHS
+            self.random_seed = dustats_pipeline.DUSTATS_NN_RANDOM_SEED
+        except Exception as e:
+            raise DUStatsException(e, sys)
