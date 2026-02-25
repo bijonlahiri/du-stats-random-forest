@@ -31,6 +31,7 @@ def accuracy_fn(y_true, y_pred):
 def nn_training(X_train, y_train, num_hidden_layers, num_neurons, num_epochs=100, random_seed=0)->dict:
     try:
         device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        logging.info(f'Device: {device}')
         torch.manual_seed(random_seed)
         X_train = torch.from_numpy(X_train).type(torch.float).to(device)
         y_train = torch.from_numpy(y_train).type(torch.long).to(device)
