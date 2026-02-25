@@ -42,7 +42,7 @@ def nn_training(X_train, y_train, num_hidden_layers, num_neurons, num_epochs=100
             output_size=len(torch.unique(y_train)),
             num_hidden_layers=num_hidden_layers,
             num_neurons=num_neurons
-        )
+        ).to(device)
         logging.info(f"Model: {nn_model}")
         loss_fn = nn.CrossEntropyLoss()
         optimizer = torch.optim.SGD(nn_model.parameters(), lr=0.01)
