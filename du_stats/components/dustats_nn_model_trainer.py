@@ -23,6 +23,7 @@ class DUStatsNeuralNetworkTrainer:
             if self.transformation_done:
                 train_data = load_numpy_array_from_file(self.train_filepath)
                 X_train, y_train = train_data[:, :-1], train_data[:,-1]
+                logging.info(f"Train data size: {train_data.shape}")
                 training_report = nn_training(
                     X_train=X_train,
                     y_train=y_train,
