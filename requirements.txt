@@ -1,7 +1,7 @@
 python-dotenv
 ipykernel
 databricks-sql-connector
-numpy<2.0
+numpy
 scikit-learn
 pandas
 pyaml
