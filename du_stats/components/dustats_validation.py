@@ -47,9 +47,9 @@ class DUStatsValidation:
             test_columns = [list(col.keys())[0] for col in self._schema['numerical_columns']]
             report={}
             for column in test_columns:
-                drift_result = float(np.round(ks_2samp(train_df[column], test_df[column]).pvalue, 2))
+                drift_result = float(ks_2samp(train_df[column], test_df[column]).pvalue)
                 report[column] = {
-                    'p_value': drift_result,
+                    'p_value': f'{drift_result: .2f}',
                     'drift_status': (drift_result < self.data_drift_threshold)
                 }
             save_yaml(self.validation_report_filepath, report)
