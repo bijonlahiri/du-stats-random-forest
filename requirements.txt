@@ -7,4 +7,5 @@ pandas
 pyaml
 mlflow
 torch
+tqdm
 ##-e .

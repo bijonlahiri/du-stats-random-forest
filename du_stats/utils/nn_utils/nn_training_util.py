@@ -3,6 +3,7 @@ from torch import nn
 import os, sys
 from du_stats.exception.exception import DUStatsException
 from du_stats.logging.logger import logging
+from tqdm.auto import tqdm
 
 class DUStatsNeuralNetwork(nn.Module):
     def __init__(self, input_size, output_size, num_hidden_layers=1, num_neurons=4):
@@ -48,7 +49,7 @@ def nn_training(X_train, y_train, num_hidden_layers, num_neurons, num_epochs=100
         loss_fn = nn.CrossEntropyLoss()
         optimizer = torch.optim.SGD(nn_model.parameters(), lr=0.01)
         report = {}
-        for epoch in range(num_epochs):
+        for epoch in tqdm(range(num_epochs)):
             nn_model.train()
             # Forward pass
             y_logits = nn_model(X_train)
