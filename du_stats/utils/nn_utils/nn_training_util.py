@@ -3,7 +3,7 @@ from torch import nn
 import os, sys
 from du_stats.exception.exception import DUStatsException
 from du_stats.logging.logger import logging
-from tqdm.auto import tqdm
+from tqdm import tqdm
 
 class DUStatsNeuralNetwork(nn.Module):
     def __init__(self, input_size, output_size, num_hidden_layers=1, num_neurons=4):
