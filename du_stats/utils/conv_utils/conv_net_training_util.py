@@ -64,7 +64,7 @@ def convnet_training(dataloader:torch.utils.data.DataLoader,
                 'Train Accuracy': f'{acc:.2f}%'
             }
 
-        return report, convnet_model
+        return report, convnet_model.cpu()
 
     except Exception as e:
         raise DUStatsException(e, sys)
