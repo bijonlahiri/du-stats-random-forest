@@ -43,7 +43,7 @@ def convnet_training(dataloader:torch.utils.data.DataLoader,
         optimizer = torch.optim.SGD(params=convnet_model.parameters(), lr=0.01)
         convnet_model.train()
         report = {}
-        for epoch in tqdm(range(num_epochs)):
+        for epoch in tqdm(range(num_epochs), desc='Training Conv Net'):
             train_loss = 0
             acc = 0
             for batch, (X, y) in enumerate(dataloader):
@@ -64,7 +64,7 @@ def convnet_training(dataloader:torch.utils.data.DataLoader,
                 'Train Accuracy': f'{acc:.2f}%'
             }
 
-        return report
+        return report, convnet_model
 
     except Exception as e:
         raise DUStatsException(e, sys)
