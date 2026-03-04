@@ -1,9 +1,11 @@
 python-dotenv
 ipykernel
 databricks-sql-connector
-numpy
+numpy<2.0
 scikit-learn
 pandas
 pyaml
 mlflow
+torch
+tqdm
 ##-e .

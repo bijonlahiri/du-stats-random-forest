@@ -30,3 +30,8 @@ class DUStatsModelTrainerArtifact:
     model_report_filepath:str=None
     best_model_name:str=None
     best_model_params:dict=None
+
+@dataclass
+class DUStatsNeuralNetworkArtifact:
+    nn_training_done:bool=False
+    nn_training_report_filepath:str=None

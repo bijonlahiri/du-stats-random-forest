@@ -4,9 +4,10 @@ from du_stats.components.dustats_ingestion import DUStatsIngestion
 from du_stats.components.dustats_validation import DUStatsValidation
 from du_stats.components.dustats_transformation import DUStatsTransformation
 from du_stats.components.dustats_model_trainer import DUStatsModelTrainer
+from du_stats.components.dustats_nn_model_trainer import DUStatsNeuralNetworkTrainer
 from du_stats.entity.config_entity import(
     DUStatsPipelineConfig, DUStatsIngestionConfig, DUStatsValidationConfig, DUStatsTransformationConfig,
-    DUStatsModelTrainerConfig
+    DUStatsModelTrainerConfig, DUStatsNeuralNetworkConfig
 )
 from du_stats.exception.exception import DUStatsException
 
@@ -35,22 +36,30 @@ if __name__=='__main__':
         """)
         dustats_transformation_config = DUStatsTransformationConfig(dustats_pipeline_config)
         dustats_transformation = DUStatsTransformation(dustats_validation_artifact, dustats_transformation_config)
-        dustats_transformation_artifact = dustats_transformation.initiate_data_transformation()
+        dustats_transformation_artifact = dustats_transformation.initiate_data_transformation_convnet()
         print(f"""
             Transformation Completed: {dustats_transformation_artifact.transformation_done}\n
             Preprocessor Filepath: {dustats_transformation_artifact.preprocessor_filepath}\n
             Train Array Filepath: {dustats_transformation_artifact.transformed_train_data_filepath}\n
             Test Array Filepath: {dustats_transformation_artifact.transformed_train_data_filepath}\n
         """)
-        dustats_model_trainer_config = DUStatsModelTrainerConfig(dustats_pipeline_config)
-        dustats_model_trainer = DUStatsModelTrainer(dustats_transformation_artifact, dustats_model_trainer_config)
-        dustats_model_trainer_artifact = dustats_model_trainer.initiate_model_trainer()
+        # dustats_model_trainer_config = DUStatsModelTrainerConfig(dustats_pipeline_config)
+        # dustats_model_trainer = DUStatsModelTrainer(dustats_transformation_artifact, dustats_model_trainer_config)
+        # dustats_model_trainer_artifact = dustats_model_trainer.initiate_model_trainer()
+        # print(f"""
+        #     Model Training Completed: {dustats_model_trainer_artifact.model_training_done}\n
+        #     Model Filepath: {dustats_model_trainer_artifact.model_filepath}\n
+        #     Model Report Filepath: {dustats_model_trainer_artifact.model_report_filepath}\n
+        #     Best Model Name: {dustats_model_trainer_artifact.best_model_name}\n
+        #     Best Model Params: {dustats_model_trainer_artifact.best_model_params}\n
+        # """)
+        dustats_nn_config = DUStatsNeuralNetworkConfig(dustats_pipeline_config)
+        dustats_nn_trainer = DUStatsNeuralNetworkTrainer(dustats_transformation_artifact, dustats_nn_config)
+        dustats_nn_artifact = dustats_nn_trainer.initiate_convnet_training()
         print(f"""
-            Model Training Completed: {dustats_model_trainer_artifact.model_training_done}\n
-            Model Filepath: {dustats_model_trainer_artifact.model_filepath}\n
-            Model Report Filepath: {dustats_model_trainer_artifact.model_report_filepath}\n
-            Best Model Name: {dustats_model_trainer_artifact.best_model_name}\n
-            Best Model Params: {dustats_model_trainer_artifact.best_model_params}\n
+            Neural Network Training Completed: {dustats_nn_artifact.nn_training_done}\n
+            Training report filepath: {dustats_nn_artifact.nn_training_report_filepath}\n
         """)
+
     except Exception as e:
         raise DUStatsException(e, sys)

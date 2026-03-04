@@ -3,6 +3,7 @@ from du_stats.exception.exception import DUStatsException
 from du_stats.logging.logger import logging
 import pandas as pd
 import numpy as np
+import torch
 import os, sys
 from dotenv import load_dotenv
 import time, yaml, pickle
@@ -135,5 +136,19 @@ def fetch_data(fetch_query:str)->pd.DataFrame:
             df = pd.DataFrame()
             return df
         
+    except Exception as e:
+        raise DUStatsException(e, sys)
+
+def save_tensor_artifact(filepath:str, X:torch.Tensor, y:torch.Tensor)->None:
+    try:
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        torch.save([X, y], filepath)
+    except Exception as e:
+        raise DUStatsException(e, sys)
+
+def load_tensor_artifact(filepath:str)->tuple:
+    try:
+        X, y = torch.load(filepath)
+        return X, y
     except Exception as e:
         raise DUStatsException(e, sys)
