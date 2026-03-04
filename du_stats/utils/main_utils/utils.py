@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import torch
 import os, sys
+from tqdm import tqdm
 from dotenv import load_dotenv
 import time, yaml, pickle
 from du_stats.constants.dustats_pipeline import SLEEP_TIME, SCHEMA_FILEPATH
@@ -114,15 +115,25 @@ def fetch_data(fetch_query:str)->pd.DataFrame:
             logging.info('Environment successfully loaded')
             for i in range(5):
                 try:
+                    rows = []
+                    batch_size = 1000
                     with connect(
                         server_hostname=os.getenv('DATABRICKS_SERVER_HOSTNAME'),
                         http_path=os.getenv('DATABRICKS_HTTP_PATH'),
                         access_token=os.getenv('DATABRICKS_ACCESS_TOKEN')
                     ) as connection:
                         with connection.cursor() as cursor:
+                            cursor.execute('SELECT COUNT(*) FROM `du_stats`.`silver`.`synth_histo_table`')
+                            total_rows = cursor.fetchone()[0]
                             cursor.execute(fetch_query)
-                            result = cursor.fetchall()
-                    df = pd.DataFrame(data=result, columns=columns)
+                            with tqdm(total=total_rows, desc='Downloading data') as pbar:
+                                while True:
+                                    batch = cursor.fetchmany(batch_size)
+                                    if not batch:
+                                        break
+                                    rows.extend(batch)
+                                    pbar.update(len(batch))
+                    df = pd.DataFrame(data=rows, columns=columns)
                     return df
 
                 except Exception as e:
@@ -150,5 +161,23 @@ def load_tensor_artifact(filepath:str)->tuple:
     try:
         X, y = torch.load(filepath)
         return X, y
+    except Exception as e:
+        raise DUStatsException(e, sys)
+
+def save_model_state_dict(filepath:str, model_state_dict:dict):
+    try:
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        torch.save(model_state_dict, filepath)
+    except Exception as e:
+        raise DUStatsException(e, sys)
+
+def load_model_state_dict(filepath:str)->dict:
+    try:
+        if os.path.exists(filepath):
+            state_dict = torch.load(filepath, weights_only=True)
+            return state_dict
+        else:
+            logging.info(f'No model found in path: {filepath}')
+            return None
     except Exception as e:
         raise DUStatsException(e, sys)

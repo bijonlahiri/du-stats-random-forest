@@ -35,3 +35,5 @@ class DUStatsModelTrainerArtifact:
 class DUStatsNeuralNetworkArtifact:
     nn_training_done:bool=False
     nn_training_report_filepath:str=None
+    nn_model_filepath:str=None
+    nn_evaluation_report_filepath:str=None

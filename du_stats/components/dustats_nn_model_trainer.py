@@ -4,9 +4,12 @@ from du_stats.logging.logger import logging
 from du_stats.entity.artifact_entity import DUStatsTransformationArtifact, DUStatsNeuralNetworkArtifact
 from du_stats.entity.config_entity import DUStatsNeuralNetworkConfig
 from du_stats.utils.nn_utils.nn_training_util import nn_training
-from du_stats.utils.main_utils.utils import load_numpy_array_from_file, save_yaml, load_tensor_artifact
+from du_stats.utils.main_utils.utils import (
+    load_numpy_array_from_file, save_yaml, load_tensor_artifact, save_model_state_dict
+)
 from du_stats.utils.conv_utils.data_loader_utils import create_data_loader
 from du_stats.utils.conv_utils.conv_net_training_util import convnet_training
+from du_stats.utils.conv_utils.conv_net_evaluation_util import convnet_evaluation
 
 class DUStatsNeuralNetworkTrainer:
     def __init__(self, dustats_transformation_artifact: DUStatsTransformationArtifact, dustats_nn_config: DUStatsNeuralNetworkConfig):
@@ -18,6 +21,8 @@ class DUStatsNeuralNetworkTrainer:
         self.test_filepath = dustats_transformation_artifact.transformed_test_data_filepath
         self.transformation_done = dustats_transformation_artifact.transformation_done
         self.random_seed = dustats_nn_config.random_seed
+        self.model_filepath = dustats_nn_config.model_filepath
+        self.evaluation_report_filepath = dustats_nn_config.evaluation_report_filepath
     
     def initiate_nn_training(self):
         dustats_nn_artifact = DUStatsNeuralNetworkArtifact()
@@ -50,11 +55,17 @@ class DUStatsNeuralNetworkTrainer:
             if self.transformation_done:
                 X_train, y_train = load_tensor_artifact(filepath=self.train_filepath)
                 train_loader = create_data_loader(X_train, y_train, batch_size=32, shuffle=True)
-
-                training_report = convnet_training(train_loader, 22, 4, 100, 42)
+                X_test, y_test = load_tensor_artifact(filepath=self.test_filepath)
+                test_loader = create_data_loader(X_test, y_test, batch_size=32, shuffle=False)
+                training_report, model = convnet_training(train_loader, 22, 4, 100, 42)
+                evaluation_report = convnet_evaluation(model, test_loader)
                 save_yaml(self.training_report_filepath, training_report)
+                save_yaml(self.evaluation_report_filepath, evaluation_report)
+                save_model_state_dict(self.model_filepath, model.state_dict())
                 dustats_convnet_artifact.nn_training_done = True
                 dustats_convnet_artifact.nn_training_report_filepath = self.training_report_filepath
+                dustats_convnet_artifact.nn_model_filepath = self.model_filepath
+                dustats_convnet_artifact.nn_evaluation_report_filepath = self.evaluation_report_filepath
 
                 return dustats_convnet_artifact
 

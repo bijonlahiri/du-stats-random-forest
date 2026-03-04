@@ -48,7 +48,7 @@ def nn_training(X_train, y_train, num_hidden_layers, num_neurons, num_epochs=100
         loss_fn = nn.CrossEntropyLoss()
         optimizer = torch.optim.SGD(nn_model.parameters(), lr=0.01)
         report = {}
-        for epoch in tqdm(range(num_epochs)):
+        for epoch in tqdm(range(num_epochs), desc='Training Neural Net'):
             nn_model.train()
             # Forward pass
             y_logits = nn_model(X_train)

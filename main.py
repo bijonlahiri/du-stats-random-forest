@@ -59,6 +59,8 @@ if __name__=='__main__':
         print(f"""
             Neural Network Training Completed: {dustats_nn_artifact.nn_training_done}\n
             Training report filepath: {dustats_nn_artifact.nn_training_report_filepath}\n
+            Evaluation report filepath: {dustats_nn_artifact.nn_evaluation_report_filepath}\n
+            Trained model filepath: {dustats_nn_artifact.nn_model_filepath}\n
         """)
 
     except Exception as e:

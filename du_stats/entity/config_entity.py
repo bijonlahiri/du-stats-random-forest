@@ -159,6 +159,21 @@ class DUStatsNeuralNetworkConfig:
                 self.training_dir,
                 dustats_pipeline.DUSTATS_NN_TRAINING_REPORT_FILENAME
             )
+            self.model_dir = os.path.join(
+                self.artifact_dir,
+                dustats_pipeline.DUSTATS_NN_DIR,
+                dustats_pipeline.DUSTATS_NN_MODEL_DIR
+            )
+            self.model_filepath = os.path.join(
+                self.model_dir,
+                dustats_pipeline.DUSTATS_NN_MODEL_FILENAME
+            )
+            self.evaluation_report_filepath = os.path.join(
+                self.artifact_dir,
+                dustats_pipeline.DUSTATS_NN_DIR,
+                dustats_pipeline.DUSTATS_NN_EVALUATION_DIR,
+                dustats_pipeline.DUSTATS_NN_EVALUATION_REPORT_FILENAME
+            )
             self.hidden_layers = dustats_pipeline.DUSTATS_NN_NUM_HIDDEN_LAYERS
             self.num_neurons = dustats_pipeline.DUSTATS_NN_NUM_NEURONS
             self.num_epochs = dustats_pipeline.DUSTATS_NN_NUM_TRAINING_EPOCHS
