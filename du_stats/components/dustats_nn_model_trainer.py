@@ -4,7 +4,9 @@ from du_stats.logging.logger import logging
 from du_stats.entity.artifact_entity import DUStatsTransformationArtifact, DUStatsNeuralNetworkArtifact
 from du_stats.entity.config_entity import DUStatsNeuralNetworkConfig
 from du_stats.utils.nn_utils.nn_training_util import nn_training
-from du_stats.utils.main_utils.utils import load_numpy_array_from_file, save_yaml
+from du_stats.utils.main_utils.utils import load_numpy_array_from_file, save_yaml, load_tensor_artifact
+from du_stats.utils.conv_utils.data_loader_utils import create_data_loader
+from du_stats.utils.conv_utils.conv_net_training_util import convnet_training
 
 class DUStatsNeuralNetworkTrainer:
     def __init__(self, dustats_transformation_artifact: DUStatsTransformationArtifact, dustats_nn_config: DUStatsNeuralNetworkConfig):
@@ -39,5 +41,25 @@ class DUStatsNeuralNetworkTrainer:
             else:
                 logging.info('Transformation not done. Skipping NN training.')
                 return dustats_nn_artifact
+        except Exception as e:
+            raise DUStatsException(e, sys)
+    
+    def initiate_convnet_training(self):
+        dustats_convnet_artifact = DUStatsNeuralNetworkArtifact()
+        try:
+            if self.transformation_done:
+                X_train, y_train = load_tensor_artifact(filepath=self.train_filepath)
+                train_loader = create_data_loader(X_train, y_train, batch_size=32, shuffle=True)
+
+                training_report = convnet_training(train_loader, 22, 4, 100, 42)
+                save_yaml(self.training_report_filepath, training_report)
+                dustats_convnet_artifact.nn_training_done = True
+                dustats_convnet_artifact.nn_training_report_filepath = self.training_report_filepath
+
+                return dustats_convnet_artifact
+
+            else:
+                logging.info('Transformation not done. Skipping CONVNET training.')
+                return dustats_convnet_artifact
         except Exception as e:
             raise DUStatsException(e, sys)
