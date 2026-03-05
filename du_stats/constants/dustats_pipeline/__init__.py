@@ -4,9 +4,12 @@ import os
 Define common constants
 """
 TARGET_COLUMN:str='rca_label'
+ROW_FETCH_QUERY:str="""
+SELECT COUNT(*) FROM `du_stats`.`training_data`.`synth_histo_table`
+"""
 TABLE_FETCH_QUERY:str="""
 SELECT *
-FROM `du_stats`.`silver`.`synth_histo_table`
+FROM `du_stats`.`training_data`.`synth_histo_table`
 --WHERE log_date=DATE('2026-01-01') AND ueid=17017
 ORDER BY site_name, log_date, cellid, ueid, uptime
 """

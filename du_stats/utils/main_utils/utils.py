@@ -8,7 +8,7 @@ import os, sys
 from tqdm import tqdm
 from dotenv import load_dotenv
 import time, yaml, pickle
-from du_stats.constants.dustats_pipeline import SLEEP_TIME, SCHEMA_FILEPATH
+from du_stats.constants.dustats_pipeline import SLEEP_TIME, SCHEMA_FILEPATH, ROW_FETCH_QUERY
 
 def load_object_from_file(filepath:str)->object:
     try:
@@ -123,7 +123,7 @@ def fetch_data(fetch_query:str)->pd.DataFrame:
                         access_token=os.getenv('DATABRICKS_ACCESS_TOKEN')
                     ) as connection:
                         with connection.cursor() as cursor:
-                            cursor.execute('SELECT COUNT(*) FROM `du_stats`.`silver`.`synth_histo_table`')
+                            cursor.execute(ROW_FETCH_QUERY)
                             total_rows = cursor.fetchone()[0]
                             cursor.execute(fetch_query)
                             with tqdm(total=total_rows, desc='Downloading data') as pbar:
