@@ -4,9 +4,12 @@ import os
 Define common constants
 """
 TARGET_COLUMN:str='rca_label'
+ROW_FETCH_QUERY:str="""
+SELECT COUNT(*) FROM `du_stats`.`gold`.`synth_histo_table`
+"""
 TABLE_FETCH_QUERY:str="""
 SELECT *
-FROM `du_stats`.`silver`.`synth_histo_table`
+FROM `du_stats`.`gold`.`synth_histo_table`
 --WHERE log_date=DATE('2026-01-01') AND ueid=17017
 ORDER BY site_name, log_date, cellid, ueid, uptime
 """
@@ -45,7 +48,7 @@ DUSTATS_TRANSFORMATION_DATA_DIR:str='transformed_data'
 DUSTATS_TRANSFORMATION_MODEL_DIR:str='transformer_model'
 DUSTATS_TRANSFORMATION_MODEL_FILENAME:str='preprocessor.pkl'
 DUSTATS_TRANSFORMATION_CONVNET:bool=True
-DUSTATS_TRANSFORMATION_CONVNET_SEQ_LEN:int=961
+DUSTATS_TRANSFORMATION_CONVNET_SEQ_LEN:int=120
 DUSTATS_TRANSFORMATION_CONVNET_TRAIN_TEST_RATIO:float=0.2
 
 """
