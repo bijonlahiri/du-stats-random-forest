@@ -1,0 +1,11 @@
+python-dotenv
+ipykernel
+databricks-sql-connector
+numpy
+scikit-learn
+pandas
+pyaml
+mlflow
+torch
+tqdm
+##-e .
