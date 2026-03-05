@@ -36,7 +36,7 @@ if __name__=='__main__':
         """)
         dustats_transformation_config = DUStatsTransformationConfig(dustats_pipeline_config)
         dustats_transformation = DUStatsTransformation(dustats_validation_artifact, dustats_transformation_config)
-        dustats_transformation_artifact = dustats_transformation.initiate_data_transformation_convnet()
+        dustats_transformation_artifact = dustats_transformation.initiate_data_transformation()
         print(f"""
             Transformation Completed: {dustats_transformation_artifact.transformation_done}\n
             Preprocessor Filepath: {dustats_transformation_artifact.preprocessor_filepath}\n
@@ -55,7 +55,7 @@ if __name__=='__main__':
         # """)
         dustats_nn_config = DUStatsNeuralNetworkConfig(dustats_pipeline_config)
         dustats_nn_trainer = DUStatsNeuralNetworkTrainer(dustats_transformation_artifact, dustats_nn_config)
-        dustats_nn_artifact = dustats_nn_trainer.initiate_convnet_training()
+        dustats_nn_artifact = dustats_nn_trainer.initiate_nn_training()
         print(f"""
             Neural Network Training Completed: {dustats_nn_artifact.nn_training_done}\n
             Training report filepath: {dustats_nn_artifact.nn_training_report_filepath}\n

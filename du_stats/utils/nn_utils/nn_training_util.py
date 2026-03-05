@@ -63,6 +63,6 @@ def nn_training(X_train, y_train, num_hidden_layers, num_neurons, num_epochs=100
                 'Train Loss': loss.item(),
                 'Train Accuracy': acc
             }
-        return report
+        return report, nn_model.cpu()
     except Exception as e:
         raise DUStatsException(e, sys)
