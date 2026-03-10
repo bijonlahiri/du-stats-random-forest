@@ -1,4 +1,5 @@
 import os, sys
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from du_stats.logging.logger import logging
 from du_stats.components.dustats_ingestion import DUStatsIngestion
 from du_stats.components.dustats_validation import DUStatsValidation
@@ -7,9 +8,66 @@ from du_stats.components.dustats_model_trainer import DUStatsModelTrainer
 from du_stats.components.dustats_nn_model_trainer import DUStatsNeuralNetworkTrainer
 from du_stats.entity.config_entity import(
     DUStatsPipelineConfig, DUStatsIngestionConfig, DUStatsValidationConfig, DUStatsTransformationConfig,
-    DUStatsModelTrainerConfig, DUStatsNeuralNetworkConfig
+    DUStatsModelTrainerConfig, DUStatsNeuralNetworkConfig, DUStatsTransformationMLConfig,
+    DUStatsTransformationANNConfig, DUStatsTransformationConvNetConfig
 )
 from du_stats.exception.exception import DUStatsException
+
+def transform_and_train_ml(pipeline_config, validation_artifact):
+    """Transform data for ML and train traditional ML models."""
+    try:
+        logging.info("ML: Transformation and training started.")
+        ml_config = DUStatsTransformationMLConfig(pipeline_config)
+        transformation = DUStatsTransformation(validation_artifact, ml_config)
+        ml_transform_artifact = transformation.initiate_data_transformation_ml()
+
+        model_trainer_config = DUStatsModelTrainerConfig(pipeline_config)
+        model_trainer = DUStatsModelTrainer(ml_transform_artifact, model_trainer_config)
+        ml_model_artifact = model_trainer.initiate_model_trainer()
+
+        logging.info("ML: Training completed.")
+        return ('ML', ml_model_artifact)
+    except Exception as e:
+        logging.error(f"ML: Error occurred - {str(e)}")
+        return ('ML', None)
+
+def transform_and_train_ann(pipeline_config, validation_artifact):
+    """Transform data for ANN and train artificial neural network."""
+    try:
+        logging.info("ANN: Transformation and training started.")
+        ann_config = DUStatsTransformationANNConfig(pipeline_config)
+        transformation = DUStatsTransformation(validation_artifact, ann_config)
+        ann_transform_artifact = transformation.initiate_data_transformation_ann()
+
+        # Note: ANN trainer may need to be implemented or use existing NN trainer
+        # For now, using the same neural network trainer
+        nn_config = DUStatsNeuralNetworkConfig(pipeline_config)
+        nn_trainer = DUStatsNeuralNetworkTrainer(ann_transform_artifact, nn_config)
+        ann_artifact = nn_trainer.initiate_convnet_training()
+
+        logging.info("ANN: Training completed.")
+        return ('ANN', ann_artifact)
+    except Exception as e:
+        logging.error(f"ANN: Error occurred - {str(e)}")
+        return ('ANN', None)
+
+def transform_and_train_convnet(pipeline_config, validation_artifact):
+    """Transform data for ConvNet and train 1D convolutional neural network."""
+    try:
+        logging.info("ConvNet: Transformation and training started.")
+        convnet_config = DUStatsTransformationConvNetConfig(pipeline_config)
+        transformation = DUStatsTransformation(validation_artifact, convnet_config)
+        convnet_transform_artifact = transformation.initiate_data_transformation_convnet()
+
+        nn_config = DUStatsNeuralNetworkConfig(pipeline_config)
+        nn_trainer = DUStatsNeuralNetworkTrainer(convnet_transform_artifact, nn_config)
+        convnet_artifact = nn_trainer.initiate_convnet_training()
+
+        logging.info("ConvNet: Training completed.")
+        return ('ConvNet', convnet_artifact)
+    except Exception as e:
+        logging.error(f"ConvNet: Error occurred - {str(e)}")
+        return ('ConvNet', None)
 
 if __name__=='__main__':
     try:
@@ -34,34 +92,37 @@ if __name__=='__main__':
             Invalid Train Filepath: {dustats_validation_artifact.invalid_train_data_filepath}\n
             Invalid Test Filepath: {dustats_validation_artifact.invalid_test_data_filepath}\n
         """)
-        dustats_transformation_config = DUStatsTransformationConfig(dustats_pipeline_config)
-        dustats_transformation = DUStatsTransformation(dustats_validation_artifact, dustats_transformation_config)
-        dustats_transformation_artifact = dustats_transformation.initiate_data_transformation_convnet()
-        print(f"""
-            Transformation Completed: {dustats_transformation_artifact.transformation_done}\n
-            Preprocessor Filepath: {dustats_transformation_artifact.preprocessor_filepath}\n
-            Train Array Filepath: {dustats_transformation_artifact.transformed_train_data_filepath}\n
-            Test Array Filepath: {dustats_transformation_artifact.transformed_train_data_filepath}\n
-        """)
-        # dustats_model_trainer_config = DUStatsModelTrainerConfig(dustats_pipeline_config)
-        # dustats_model_trainer = DUStatsModelTrainer(dustats_transformation_artifact, dustats_model_trainer_config)
-        # dustats_model_trainer_artifact = dustats_model_trainer.initiate_model_trainer()
-        # print(f"""
-        #     Model Training Completed: {dustats_model_trainer_artifact.model_training_done}\n
-        #     Model Filepath: {dustats_model_trainer_artifact.model_filepath}\n
-        #     Model Report Filepath: {dustats_model_trainer_artifact.model_report_filepath}\n
-        #     Best Model Name: {dustats_model_trainer_artifact.best_model_name}\n
-        #     Best Model Params: {dustats_model_trainer_artifact.best_model_params}\n
-        # """)
-        dustats_nn_config = DUStatsNeuralNetworkConfig(dustats_pipeline_config)
-        dustats_nn_trainer = DUStatsNeuralNetworkTrainer(dustats_transformation_artifact, dustats_nn_config)
-        dustats_nn_artifact = dustats_nn_trainer.initiate_convnet_training()
-        print(f"""
-            Neural Network Training Completed: {dustats_nn_artifact.nn_training_done}\n
-            Training report filepath: {dustats_nn_artifact.nn_training_report_filepath}\n
-            Evaluation report filepath: {dustats_nn_artifact.nn_evaluation_report_filepath}\n
-            Trained model filepath: {dustats_nn_artifact.nn_model_filepath}\n
-        """)
+
+        print("\n" + "="*80)
+        print("Running ML, ANN, and ConvNet in parallel...")
+        print("="*80 + "\n")
+
+        # Run all three model pipelines in parallel
+        with ThreadPoolExecutor(max_workers=3) as executor:
+            futures = {
+                executor.submit(transform_and_train_ml, dustats_pipeline_config, dustats_validation_artifact): 'ML',
+                executor.submit(transform_and_train_ann, dustats_pipeline_config, dustats_validation_artifact): 'ANN',
+                executor.submit(transform_and_train_convnet, dustats_pipeline_config, dustats_validation_artifact): 'ConvNet'
+            }
+
+            results = {}
+            for future in as_completed(futures):
+                model_type, artifact = future.result()
+                results[model_type] = artifact
+                if artifact:
+                    print(f"\n{model_type} Training Results:")
+                    print(f"  Training Done: {artifact.model_training_done if hasattr(artifact, 'model_training_done') else artifact.nn_training_done}")
+                    if hasattr(artifact, 'model_filepath'):
+                        print(f"  Model Filepath: {artifact.model_filepath}")
+                        print(f"  Report Filepath: {artifact.model_report_filepath}")
+                    else:
+                        print(f"  Model Filepath: {artifact.nn_model_filepath}")
+                        print(f"  Training Report: {artifact.nn_training_report_filepath}")
+                        print(f"  Evaluation Report: {artifact.nn_evaluation_report_filepath}")
+
+        print("\n" + "="*80)
+        print("All models training completed!")
+        print("="*80)
 
     except Exception as e:
         raise DUStatsException(e, sys)
