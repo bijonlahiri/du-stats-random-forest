@@ -180,3 +180,83 @@ class DUStatsNeuralNetworkConfig:
             self.random_seed = dustats_pipeline.DUSTATS_NN_RANDOM_SEED
         except Exception as e:
             raise DUStatsException(e, sys)
+
+class DUStatsTransformationMLConfig:
+    def __init__(self, dustats_pipeline_config:DUStatsPipelineConfig):
+        try:
+            self.artifact_dir = dustats_pipeline_config.artifact_dir
+            self.train_data_filepath = os.path.join(
+                self.artifact_dir,
+                dustats_pipeline.DUSTATS_TRANSFORMATION_DIR,
+                dustats_pipeline.DUSTATS_TRANSFORMATION_DATA_DIR,
+                'ml_' + dustats_pipeline.TRAIN_FILENAME.replace('.csv', '.npy')
+            )
+            self.test_data_filepath = os.path.join(
+                self.artifact_dir,
+                dustats_pipeline.DUSTATS_TRANSFORMATION_DIR,
+                dustats_pipeline.DUSTATS_TRANSFORMATION_DATA_DIR,
+                'ml_' + dustats_pipeline.TEST_FILENAME.replace('.csv', '.npy')
+            )
+            self.preprocessor_filepath = os.path.join(
+                self.artifact_dir,
+                dustats_pipeline.DUSTATS_TRANSFORMATION_DIR,
+                dustats_pipeline.DUSTATS_TRANSFORMATION_MODEL_DIR,
+                'ml_' + dustats_pipeline.DUSTATS_TRANSFORMATION_MODEL_FILENAME
+            )
+            self.target_column = dustats_pipeline.TARGET_COLUMN
+        except Exception as e:
+            raise DUStatsException(e, sys)
+
+class DUStatsTransformationANNConfig:
+    def __init__(self, dustats_pipeline_config:DUStatsPipelineConfig):
+        try:
+            self.artifact_dir = dustats_pipeline_config.artifact_dir
+            self.train_data_filepath = os.path.join(
+                self.artifact_dir,
+                dustats_pipeline.DUSTATS_TRANSFORMATION_DIR,
+                dustats_pipeline.DUSTATS_TRANSFORMATION_DATA_DIR,
+                'ann_' + dustats_pipeline.TRAIN_FILENAME.replace('.csv', '.npy')
+            )
+            self.test_data_filepath = os.path.join(
+                self.artifact_dir,
+                dustats_pipeline.DUSTATS_TRANSFORMATION_DIR,
+                dustats_pipeline.DUSTATS_TRANSFORMATION_DATA_DIR,
+                'ann_' + dustats_pipeline.TEST_FILENAME.replace('.csv', '.npy')
+            )
+            self.preprocessor_filepath = os.path.join(
+                self.artifact_dir,
+                dustats_pipeline.DUSTATS_TRANSFORMATION_DIR,
+                dustats_pipeline.DUSTATS_TRANSFORMATION_MODEL_DIR,
+                'ann_' + dustats_pipeline.DUSTATS_TRANSFORMATION_MODEL_FILENAME
+            )
+            self.target_column = dustats_pipeline.TARGET_COLUMN
+        except Exception as e:
+            raise DUStatsException(e, sys)
+
+class DUStatsTransformationConvNetConfig:
+    def __init__(self, dustats_pipeline_config:DUStatsPipelineConfig):
+        try:
+            self.artifact_dir = dustats_pipeline_config.artifact_dir
+            self.train_data_filepath = os.path.join(
+                self.artifact_dir,
+                dustats_pipeline.DUSTATS_TRANSFORMATION_DIR,
+                dustats_pipeline.DUSTATS_TRANSFORMATION_DATA_DIR,
+                'convnet_' + dustats_pipeline.TRAIN_FILENAME.replace('.csv', '.pt')
+            )
+            self.test_data_filepath = os.path.join(
+                self.artifact_dir,
+                dustats_pipeline.DUSTATS_TRANSFORMATION_DIR,
+                dustats_pipeline.DUSTATS_TRANSFORMATION_DATA_DIR,
+                'convnet_' + dustats_pipeline.TEST_FILENAME.replace('.csv', '.pt')
+            )
+            self.preprocessor_filepath = os.path.join(
+                self.artifact_dir,
+                dustats_pipeline.DUSTATS_TRANSFORMATION_DIR,
+                dustats_pipeline.DUSTATS_TRANSFORMATION_MODEL_DIR,
+                'convnet_' + dustats_pipeline.DUSTATS_TRANSFORMATION_MODEL_FILENAME
+            )
+            self.target_column = dustats_pipeline.TARGET_COLUMN
+            self.convnet_seq_len = dustats_pipeline.DUSTATS_TRANSFORMATION_CONVNET_SEQ_LEN
+            self.convnet_train_test_ratio = dustats_pipeline.DUSTATS_TRANSFORMATION_CONVNET_TRAIN_TEST_RATIO
+        except Exception as e:
+            raise DUStatsException(e, sys)

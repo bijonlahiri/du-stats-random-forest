@@ -43,7 +43,7 @@ def transform_and_train_ann(pipeline_config, validation_artifact):
         # For now, using the same neural network trainer
         nn_config = DUStatsNeuralNetworkConfig(pipeline_config)
         nn_trainer = DUStatsNeuralNetworkTrainer(ann_transform_artifact, nn_config)
-        ann_artifact = nn_trainer.initiate_convnet_training()
+        ann_artifact = nn_trainer.initiate_nn_training()
 
         logging.info("ANN: Training completed.")
         return ('ANN', ann_artifact)
@@ -98,11 +98,11 @@ if __name__=='__main__':
         print("="*80 + "\n")
 
         # Run all three model pipelines in parallel
-        with ThreadPoolExecutor(max_workers=3) as executor:
+        with ThreadPoolExecutor(max_workers=1) as executor:
             futures = {
-                executor.submit(transform_and_train_ml, dustats_pipeline_config, dustats_validation_artifact): 'ML',
                 executor.submit(transform_and_train_ann, dustats_pipeline_config, dustats_validation_artifact): 'ANN',
-                executor.submit(transform_and_train_convnet, dustats_pipeline_config, dustats_validation_artifact): 'ConvNet'
+                executor.submit(transform_and_train_convnet, dustats_pipeline_config, dustats_validation_artifact): 'ConvNet',
+                executor.submit(transform_and_train_ml, dustats_pipeline_config, dustats_validation_artifact): 'ML'
             }
 
             results = {}
