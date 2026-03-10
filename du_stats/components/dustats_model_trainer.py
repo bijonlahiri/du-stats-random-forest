@@ -59,18 +59,18 @@ class DUStatsModelTrainer:
                     # 'max_features': [1.0, 0.75, 0.5, 0.25]
                 },
                 'Adaboost': {
-                    'n_estimators': [5, 10, 50,],
+                    'n_estimators': [5, 10, 15],
                     'learning_rate': [0.001, 0.01, 0.1]
                 },
                 'Gradient Boosting': {
-                    'n_estimators': [5, 10, 50],
+                    'n_estimators': [5, 10, 15],
                     'learning_rate': [0.001, 0.01, 0.1]
                 },
                 'Random Forest': {
                     # 'criterion': ['gini', 'entropy', 'log_loss'],
                     'max_depth': [5, 10, 15],
-                    'max_features': [1.0, 0.75, 0.5],
-                    # 'n_estimators': [5, 10, 50]
+                    # 'max_features': [1.0, 0.75, 0.5],
+                    'n_estimators': [5, 10, 15]
                 }
             }
             model_report = evaluate_model(

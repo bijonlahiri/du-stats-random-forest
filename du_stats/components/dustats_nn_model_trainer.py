@@ -3,7 +3,7 @@ from du_stats.exception.exception import DUStatsException
 from du_stats.logging.logger import logging
 from du_stats.entity.artifact_entity import DUStatsTransformationArtifact, DUStatsNeuralNetworkArtifact
 from du_stats.entity.config_entity import DUStatsNeuralNetworkConfig
-from du_stats.utils.nn_utils.nn_training_util import nn_training
+from du_stats.utils.nn_utils.nn_training_util import nn_training, nn_evaluation
 from du_stats.utils.main_utils.utils import (
     load_numpy_array_from_file, save_yaml, load_tensor_artifact, save_model_state_dict
 )
@@ -31,7 +31,9 @@ class DUStatsNeuralNetworkTrainer:
                 train_data = load_numpy_array_from_file(self.train_filepath)
                 X_train, y_train = train_data[:, :-1], train_data[:,-1]
                 logging.info(f"Train data size: {train_data.shape}")
-                training_report = nn_training(
+                test_data = load_numpy_array_from_file(self.test_filepath)
+                X_test, y_test = test_data[:, :-1], test_data[:, -1]
+                training_report, nn_model = nn_training(
                     X_train=X_train,
                     y_train=y_train,
                     num_hidden_layers=self.hidden_layers,
@@ -39,9 +41,14 @@ class DUStatsNeuralNetworkTrainer:
                     num_epochs=self.num_epochs,
                     random_seed = self.random_seed if self.random_seed is not None else 0
                 )
-                save_yaml(self.training_report_filepath, training_report)
+                evaluation_report = nn_evaluation(nn_model, X_test, y_test)
+                save_yaml(f"ann_{self.training_report_filepath}", training_report)
+                save_yaml(f"ann_{self.evaluation_report_filepath}", evaluation_report)
+                save_model_state_dict(f"ann_{self.model_filepath}", nn_model)
                 dustats_nn_artifact.nn_training_done = True
                 dustats_nn_artifact.nn_training_report_filepath = self.training_report_filepath
+                dustats_nn_artifact.nn_model_filepath = self.model_filepath
+                dustats_nn_artifact.nn_evaluation_report_filepath = self.evaluation_report_filepath
                 return dustats_nn_artifact
             else:
                 logging.info('Transformation not done. Skipping NN training.')
@@ -59,9 +66,9 @@ class DUStatsNeuralNetworkTrainer:
                 test_loader = create_data_loader(X_test, y_test, batch_size=32, shuffle=False)
                 training_report, model = convnet_training(train_loader, 22, 4, 100, 42)
                 evaluation_report = convnet_evaluation(model, test_loader)
-                save_yaml(self.training_report_filepath, training_report)
-                save_yaml(self.evaluation_report_filepath, evaluation_report)
-                save_model_state_dict(self.model_filepath, model.state_dict())
+                save_yaml(f"convnet_{self.training_report_filepath}", training_report)
+                save_yaml(f"convnet_{self.evaluation_report_filepath}", evaluation_report)
+                save_model_state_dict(f"convnet_{self.model_filepath}", model.state_dict())
                 dustats_convnet_artifact.nn_training_done = True
                 dustats_convnet_artifact.nn_training_report_filepath = self.training_report_filepath
                 dustats_convnet_artifact.nn_model_filepath = self.model_filepath

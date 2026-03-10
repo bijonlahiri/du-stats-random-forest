@@ -1,5 +1,6 @@
 import torch
 from torch import nn
+import numpy as np
 import os, sys
 from du_stats.exception.exception import DUStatsException
 from du_stats.logging.logger import logging
@@ -29,7 +30,7 @@ def accuracy_fn(y_true, y_pred):
     correct = torch.eq(y_true, y_pred).sum().item()
     return (correct/len(y_true))*100
 
-def nn_training(X_train, y_train, num_hidden_layers, num_neurons, num_epochs=100, random_seed=0)->dict:
+def nn_training(X_train, y_train, num_hidden_layers, num_neurons, num_epochs=100, random_seed=0)->tuple:
     try:
         device = 'cuda' if torch.cuda.is_available() else 'cpu'
         torch.manual_seed(random_seed)
@@ -63,6 +64,21 @@ def nn_training(X_train, y_train, num_hidden_layers, num_neurons, num_epochs=100
                 'Train Loss': loss.item(),
                 'Train Accuracy': acc
             }
-        return report
+        return report, nn_model.cpu()
+    except Exception as e:
+        raise DUStatsException(e, sys)
+
+def nn_evaluation(model:nn.Module, X_test:np.array, y_test:np.array)->dict:
+    try:
+        X_test = torch.from_numpy(X_test).type(torch.float)
+        y_test = torch.from_numpy(y_test).type(torch.long)
+        model.eval()
+        with torch.inference_mode():
+            y_logits = model(X_test)
+            y_proba = torch.softmax(y_logits, dim=1)
+            y_pred = torch.argmax(y_proba, dim=1)
+            acc = accuracy_fn(y_test, y_pred)
+        
+        return {"Test accuracy": f"{acc:.2f}%"}
     except Exception as e:
         raise DUStatsException(e, sys)
