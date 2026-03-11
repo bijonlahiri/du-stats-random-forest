@@ -168,7 +168,7 @@ Edit `du_stats/constants/dustats_pipeline/__init__.py` to customize:
 # Data split ratio
 DUSTATS_INGESTION_TRAIN_TEST_SPLIT_RATIO = 0.2
 
-# Data drift threshold (KL divergence)
+# Data drift threshold (KS divergence)
 DUSTATS_VALIDATION_DATA_DRIFT_THRESHOLD = 0.05
 
 # Neural Network architecture
@@ -230,13 +230,13 @@ The pipeline expects input data with 30 columns organized into categories:
 - Gradient Boosting
 - Random Forest
 
-**Input Shape**: (n_samples, 26 features)
+**Input Shape**: (n_samples, 22 features)
 **Output**: Class probabilities
 
 ### 2. Artificial Neural Network (ANN)
 
 **Architecture**:
-- Input layer: 26 neurons (features)
+- Input layer: 22 neurons (features)
 - Hidden layer 1: 128 neurons (ReLU activation)
 - Hidden layer 2: 128 neurons (ReLU activation)
 - Output layer: 4 neurons (Softmax for 4 classes)
@@ -244,16 +244,16 @@ The pipeline expects input data with 30 columns organized into categories:
 **Preprocessing**: StandardScaler normalization
 **Framework**: PyTorch
 **Loss**: Cross-Entropy
-**Optimizer**: Adam
+**Optimizer**: SGD
 **Epochs**: 100
 
-**Input Shape**: (n_samples, 26)
+**Input Shape**: (n_samples, 22)
 **Output**: Class probabilities
 
 ### 3. 1D Convolutional Neural Network (ConvNet)
 
 **Architecture**:
-- Input: 960-sample sequences with 26 features each
+- Input: 960-sample sequences with 22 features each
 - Conv1D layers with ReLU activation
 - Max pooling for dimensionality reduction
 - Fully connected classification layers
@@ -262,13 +262,13 @@ The pipeline expects input data with 30 columns organized into categories:
 **Preprocessing**:
 - StandardScaler normalization
 - Sequence creation (960-sample windows)
-- Tensor reshaping: (n_sequences, 960, 26)
+- Tensor reshaping: (n_sequences, 960, 22)
 
 **Framework**: PyTorch
 **Loss**: Cross-Entropy
-**Optimizer**: Adam
+**Optimizer**: SGD
 
-**Input Shape**: (n_samples, 960, 26)
+**Input Shape**: (n_samples, 960, 22)
 **Output**: Class probabilities
 
 ---
@@ -295,7 +295,7 @@ Tracked metrics:
 
 ### Data Validation
 - **Schema Checks**: Validates column names, types, and ranges
-- **Drift Detection**: KL divergence < 0.05 threshold
+- **Drift Detection**: KS divergence < 0.05 threshold
 - **Missing Values**: Handling and reporting
 - **Outlier Detection**: Flagged in validation reports
 
@@ -353,7 +353,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 **Validation**
 - Compares schema against `data_schema/schema.yaml`
-- Detects data drift using KL divergence
+- Detects data drift using KS divergence
 - Separates valid/invalid records
 
 **Transformation**
@@ -440,9 +440,9 @@ pip install -r requirements_colab.txt
 
 | Model | Train Accuracy | Test Accuracy | Training Time | Model Size |
 |-------|---|---|---|---|
-| Random Forest | 92.1% | 89.3% | ~30s | 2.3 MB |
-| ANN | 88.5% | 87.1% | ~120s | 150 KB |
-| ConvNet | 90.8% | 89.6% | ~180s | 250 KB |
+| Random Forest | 93.4% | 93.2% | ~30s | 2.3 MB |
+| ANN | 89.5% | 87.1% | ~120s | 150 KB |
+| ConvNet | 98.8% | 97.6% | ~180s | 250 KB |
 
 *Note: Benchmarks are example metrics. Actual results depend on data and hyperparameters.*
 
